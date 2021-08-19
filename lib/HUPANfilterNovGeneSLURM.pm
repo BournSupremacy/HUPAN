@@ -141,7 +141,7 @@ Options:
     mkdir($stdout_out);
 ##****************************************************************************************
 
-    my $com="$exefg $seq_file $gff_file $tra_file $pro_file $genome_ref $tran_ref $cdhit_exe $blast_exe $mkblastdb_exe $repeat_exe $gene_identity $ref_identity $thread_num $data_dir\n";
+    my $com="$exefg $seq_file $gff_file $tra_file $pro_file $genome_ref $tran_ref $cdhit_exe $blast_exe $mkblastdb_exe $repeat_exe $gene_identity $ref_identity $thread_num $data_out\n";
 
 #generate and submit job script
 #************** Might be modified for different task submission system *******************
