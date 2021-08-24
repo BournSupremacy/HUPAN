@@ -59,8 +59,8 @@ my ($data_dir,$out_dir,$quast_dir,$ref)=@ARGV;
 #Detect executable quast.py
 
 $quast_dir.="/" unless($quast_dir=~/\/$/);
-my $exec_quast=$quast_dir."quast.py";
-die("Error01: Cannot find quast.py file in directory $quast_dir\n") unless(-e $exec_quast);
+my $exec_quast=$quast_dir."quast";
+die("Error01: Cannot find quast file in directory $quast_dir\n") unless(-e $exec_quast);
 
 #Check existence of reference sequence file
 die("Error02: Cannot find reference sequence file\n") unless(-e $ref);
@@ -138,7 +138,7 @@ foreach my $s (@sample){
 
 #generate command
     my $com;
-    $com="python $exec_quast --eukaryote -t $thread_num --min-contig $min_length -o $sample_out --no-plots -R $ref $contig_file";
+    $com="$exec_quast --eukaryote -t $thread_num --min-contig $min_length -o $sample_out --no-plots -R $ref $contig_file";
 
 #generate and submit job script
 #************** Might be modified for different task submission system *******************
@@ -153,7 +153,9 @@ foreach my $s (@sample){
     print JOB "\#SBATCH --output=$out_file\n";               #stdout
     print JOB "\#SBATCH --error=$err_file\n";               #stderr
     print JOB "\#SBATCH -n $thread_num\n";             #thread number
-	print JOB "\#SBATCH --ntasks-per-node=$thread_num\n";
+    print JOB "\#SBATCH --ntasks-per-node=$thread_num\n";
+    print JOB "\#SBATCH --mem=64g\n"; # set mem
+    print JOB "\#SBATCH --time=96:00:00\n"; # set time
     print JOB "$com\n";                              #commands
     close JOB;
     system("sbatch $job_file");                       #submit job

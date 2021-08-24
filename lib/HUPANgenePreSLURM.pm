@@ -51,9 +51,9 @@ Options:
     my $thread_num=1;
     $thread_num=$opt_t if defined $opt_t;
 
-    my $maker_exe=$maker_dir."/bin/maker";
-    my $gff3_merge=$maker_dir."bin/gff3_merge";
-    my $fasta_merge=$maker_dir."bin/fasta_merge";
+    my $maker_exe=$maker_dir."/maker";
+    my $gff3_merge=$maker_dir."/gff3_merge";
+    my $fasta_merge=$maker_dir."/fasta_merge";
     die("Cannot found executable file: maker in directory $maker_dir\n") unless(-e $maker_exe);
     die("Cannot found executable file: gff3_merge in directory $maker_dir\n") unless(-e $gff3_merge);
     die("Cannot found executable file: fasta_merge  in directory $maker_dir\n") unless(-e $fasta_merge);
@@ -117,13 +117,13 @@ mkdir($stdout_out);
     open(OUT,">$new_bopts_file")||die("Error10: cannot write the file: $new_bopts_file.\n");
     while(my $line=<IN>){
         chomp $line;
-        if(($line=~/^#/)||($line=~/\s*$/)){
+        if(($line=~/^#/)||($line=~/^\s*$/)){
             print OUT $line."\n";
         }
         else{
             my @string=split "=",$line;
             if(exists($config{$string[0]})){
-                print OUT $config{$string[0]}."\n";
+		print OUT $config{$string[0]} . "\n";
             }
             else{
                 print OUT $line."\n";
@@ -137,7 +137,7 @@ mkdir($stdout_out);
     open(OUT,">$new_exe_file")||die("Error10: cannot write the file: $new_exe_file.\n");
     while(my $line=<IN>){
         chomp $line;
-        if(($line=~/^#/)||($line=~/\s*$/)){
+        if(($line=~/^#/)||($line=~/^\s*$/)){
             print OUT $line."\n";
         }
         else{
@@ -153,6 +153,7 @@ mkdir($stdout_out);
     close IN;
     close OUT;
 
+     
 #read sample
     opendir(DATA,$data_dir) || die("Error: can not open the data directory: $data_dir!\n");
     my @samples=readdir(DATA);
@@ -178,7 +179,8 @@ mkdir($stdout_out);
              my $input_file=$out_sd.$file;
              $com.="cp $target_file $input_file\n";
              system($com);
-             $com="$maker_exe -c $thread_num -fix_nucleotides -genome $file\n";
+	     $com="cd ".$out_sd."\n";
+             $com.="$maker_exe --ignore_nfs_tmp maker_opts.ctl maker_bopts.ctl maker_exe.ctl -c $thread_num -fix_nucleotides -genome $file\n";
              $com.="cd ../../";
              my $log_file=$out_sd.$s.".maker.output/".$s."_master_datastore_index.log";
              my $fasta_prefix=$result_dir.$s;
@@ -187,9 +189,9 @@ mkdir($stdout_out);
              $com.="$gff3_merge -d $log_file -o $gff_file\n";
 #generate and submit job script
 ##************** Might be modified for different task submission system *******************
-             my $job_file="../job/scripts/".$s.".slurm";   #script_file
-             my $err_file="../job/err/".$s.".err";   #stderr_output_file
-             my $out_file="../job/out/".$s.".out";   #stdout_output_file
+             my $job_file=$out_dir."/job/scripts/".$s.".slurm";   #script_file
+             my $err_file=$out_dir."/job/err/".$s.".err";   #stderr_output_file
+             my $out_file=$out_dir."/job/out/".$s.".out";   #stdout_output_file
              #create job script
              open(JOB,">$job_file")||die("Error05: Unable to create job file: $job_file\n");
              print JOB "\#!/bin/bash\n";
