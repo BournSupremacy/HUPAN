@@ -66,34 +66,39 @@ The HUPAN paper is available at https://genomebiology.biomedcentral.com/articles
 
      Usage: hupan <command> ...
         
-        Available commands:
-        	qualSta      	View the overall sequencing quality of a large number of files
-        	trim         	Trim or filter low-quality reads parallelly
-        	alignRead    	Map reads to a reference parallelly
-        	sam2bam      	Covert alignments (.sam) to sorted .bam files
-        	bamSta       	Statistics of parallel mapping
-        	assemble     	Assemble reads parallelly
-        	alignContig  	Align assembly results to a referenece parallelly
-        	extractSeq   	Extract contigs parallelly
-        	assemSta     	Statistics of parallel assembly
-        	getUnalnCtg  	Extract the unaligned contigs from nucmer alignment (processed by quast)
-        	rmRedundant  	Remove redundant contigs of a fasta file
-        	pTpG         	Get the longest transcripts to represent genes
-        	geneCov      	Calculate gene body coverage and CDS coverage
-        	geneExist    	Determine gene presence-absence based on gene body coverage and CDS coverage
-        	subSample    	Select subset of samples from gene PAV profile
+        Available commands (in order of use):
+        	qualSta      	View the overall sequencing quality of a large number of fastq files
+         trim         	Trim or filter low-quality fastq reads parallelly
+         assemble     	Assemble reads parallelly
+         alignContig   Align assembled reads to the reference genome using nucmer
+         extractSeq   	Extract potentially unaligned contigs parallelly
+         assemSta     	Checks statistics of potentially unaligned contigs
+         getUnalnCtg  	Extract the unaligned contigs from nucmer alignment (processed by quast)
+         mergeUnalnCtg Merges unaligned contigs from multiple samples
+         rmRedundant  	Remove redundant contigs within a fasta file using CD-HIT
+         blastAlign   	Align sequences to nucleotide database using BLAST
+         getTaxClass  	Obtain the taxonomic classification of sequences
+         rmCtm        	Detect and discard the potential contamination
+         splitSeq     	Split sequence file into multiple smaller sized files
+         genePre      	Ab initio gene prediction of the novel sequences using RNA and protein evidence
+         mergeNovGene 	Merge MAKER results from multiple result files
+         filterNovGene	Filter the novel precited genes
+         pTpG         	Get the longest transcripts to represent genes
+         alignRead    	Map reads to a reference parallelly
+         alignContig  	Map assembled genomes to the referenece using BWA or Bowtie2
+         sam2bam      	Convert alignments (.sam) to sorted and indexed .bam files
+         geneCov      	Calculate gene body coverage and CDS coverage
+         geneExist    	Determine gene presence-absence based on gene body coverage and CDS coverage
+         sim          	Simulate and plot the pan-genome and the core genome
+         
+        Other available commands not utilised in the main pipeline (but that can still be used for extra functionality):
+         fastaSta     	Simple script to calculate number of sequences and bases within a single fasta file
+         simSeq       	Simulate and plot the total size of novel sequences
+         bamSta       	Calculates the coverage of the genomes using .bam files and Qualimap
+         bam2bed      	Calculate genome region presence-absence from .bam
+         subSample    	Select subset of samples from gene PAV profile
         	gFamExist    	Determine gene family presence-absence based on gene presence-absence
-        	bam2bed      	Calculate genome region presence-absence from .bam
-        	fastaSta     	Calculate statistics of fasta file
-        	sim          	Simulation and plot of the pan-genome and the core genome
-        	getTaxClass  	Obtain the taxonomic classification of sequences
-        	rmCtm        	Detect and discard the potentail contamination
-        	blastAlign   	Align sequences to target sequence by blast
-        	simSeq       	Simulate and plot the total size of novel sequences
-        	splitSeq     	Split sequence file into multiple small size files
-        	genePre      	Ab initio gene predict combining with RNA and protein evidence
-        	mergeNovGene 	Merge maker result from multiple maker result files
-        	filterNovGene	Filter the novel precited genes.
+        	
 
 **3.	Main analysis procedures**
 
