@@ -67,7 +67,7 @@ The HUPAN paper is available at https://genomebiology.biomedcentral.com/articles
      Usage: hupan <command> ...
         
         Available commands (in order of use):
-        	qualSta      	View the overall sequencing quality of a large number of fastq files
+         qualSta      	View the overall sequencing quality of a large number of fastq files
          trim         	Trim or filter low-quality fastq reads parallelly
          assemble     	Assemble reads parallelly
          alignContig   Align assembled reads to the reference genome using nucmer
@@ -97,7 +97,7 @@ The HUPAN paper is available at https://genomebiology.biomedcentral.com/articles
          bamSta       	Calculates the coverage of the genomes using .bam files and Qualimap
          bam2bed      	Calculate genome region presence-absence from .bam
          subSample    	Select subset of samples from gene PAV profile
-        	gFamExist    	Determine gene family presence-absence based on gene presence-absence
+         gFamExist    	Determine gene family presence-absence based on gene presence-absence
         	
 
 **3.	Main analysis procedures**
