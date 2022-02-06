@@ -125,6 +125,8 @@ foreach my $s (@sample){
     print JOB "\#SBATCH --error=$err_file\n";                 #stderr
     print JOB "\#SBATCH -n $thread_num\n";               #thread number
     print JOB "\#SBATCH --ntasks-per-node=$thread_num\n";
+    print JOB "\#SBATCH --time=9:00:00\n";
+    print JOB "\#SBATCH --mem=15GB\n";
 
     print JOB "$com\n";                                #commands
     close JOB;
