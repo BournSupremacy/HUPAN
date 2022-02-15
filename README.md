@@ -369,7 +369,7 @@ hupanSLURM sam2bam -t 8 18_map2pan/data 19_panBam /cbio/bin
 * This will result in a .bam and .bai file for each fastq file (genome/individual) given.
 * hupanSLURM sam2bam code is found in `/cbio/soft/HUPAN/lib/HUPANsamToBamSLURM.pm`
 
-**(20) Calculating gene coverage
+**(20) Calculating gene coverage**
 
 * This step calculates the coverage of each gene or CDS in all of the genomes used.
 * It does this by looking at the alignment information in the indexed and sorted .bam files from the previous step and identifying whether these alignments fall within the annotations in the pan.gtf file.
@@ -380,7 +380,7 @@ hupanSLURM geneCov -t 8 19_panBam/data 20_geneCov/ 17_pan/pan.gtf
 * This will result in a .sta file for each genome.
 * hupanSLURM geneCov code is found in `/cbio/soft/HUPAN/lib/HUPANgeneCovSLURM.pm`
 
-**(21) Determing gene presence-absence variance profile
+**(21) Determing gene presence-absence variance profile**
 
 * This steps checks whether a gene is present or absent (based on a defined coverage threshold) for each sample.
 * The gene coverage information from the 20_geneCov directory is first combined into two files, one recording gene coverage and one recording CDS coverage.
