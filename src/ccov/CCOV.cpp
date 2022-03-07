@@ -138,9 +138,13 @@ int main(int argc, char* argv[]){
   //Check coverage
   cerr <<"Calculate coverage and evenness" <<" ......"<<endl;
   checkCDSCoverage(mapper,gtf);
+  cerr <<"Finished CDSCoverage" <<endl;
   checkGeneCoverage(mapper,gtf);
+  cerr <<"Finished GeneCoverage" <<endl;
   checkCDSEvenness(mapper,gtf);
+  cerr <<"Finished CDSEvenness" <<endl;
   checkGeneEvenness(mapper,gtf);
+  cerr <<"Finished GeneEvenness" <<endl;
 
   //Output coverage
  
@@ -160,8 +164,11 @@ int main(int argc, char* argv[]){
 }
 
 void checkCDSCoverage(map<string,vector<unsigned int> > &mapper, GTF &gtf){
+  int mycount=0;
   vector<GeneStructure>::iterator giter=gtf.GeneStructureSequence.begin();
   while(giter!=gtf.GeneStructureSequence.end()){
+    mycount++;
+    cerr << "While loop number: " << mycount <<endl;
     int tlength=0;
     int slength=0;
     int alength=0;

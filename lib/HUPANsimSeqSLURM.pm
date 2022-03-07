@@ -131,7 +131,7 @@ Options:
             my $j=int(rand(scalar(@samples)));
             my $sample=$samples[$j];
             splice @samples,$j,1;
-            my $individual_file=$data_dir.$sample."/".$sample.".fa";
+            my $individual_file=$data_dir.$sample."/".$sample.".fully.contig";
             my $num=$i+1;
             my $contig_file=$simulation_dir.$num."_raw.fa";
             my $com="cp $individual_file $contig_file";
@@ -142,11 +142,11 @@ Options:
         my $com="\ncp $individual_file $in_file";
         my $outfile=$simulation_dir."1_non.redundant.fa";
         $com.="\n$exe -i $in_file -o $outfile -T $thread_num -c $iden";
-        $com.="\nfor((\$i=2;\$i<=".@sample.";\$i++));\ndo\nk=\$((\$i-1));";
-        $individual_file=$simulation_dir."\$i_raw.fa";
-        my $novel_file=$simulation_dir."\$k_non.redundant.fa";
+        $com.="\nfor((i=2;i<=".@sample.";i++));\ndo\nk=\$((\$i-1));";
+        $individual_file=$simulation_dir."\${i}_raw.fa";
+        my $novel_file=$simulation_dir."\${k}_non.redundant.fa";
         $com.="\ncat $individual_file $novel_file >$in_file";
-        $outfile=$simulation_dir."\$i_non.redundant.fa";
+        $outfile=$simulation_dir."\${i}_non.redundant.fa";
         $com.="\n$exe -i $in_file -o $outfile -T $thread_num -c $iden";
         $com.="\ndone;";
         #print $com."\n";
@@ -164,6 +164,8 @@ Options:
         print JOB "\#SBATCH --error=$err_file\n";               #stderr
         print JOB "\#SBATCH -n $thread_num\n";             #thread number
         print JOB "\#SBATCH --ntasks-per-node=$thread_num\n";
+	print JOB "\#SBATCH --time=330:00:00\n";
+	print JOB "\#SBATCH --mem=10GB\n";
         print JOB "$com\n";                              #commands
         close JOB;
         system("sbatch $job_file");                       #submit job

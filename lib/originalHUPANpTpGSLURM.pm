@@ -1,7 +1,4 @@
 #!/usr/bin/perl
-
-# This is the script for MAKER produced annotations!
-
 package pTpG;
 
 sub pTpG{
@@ -53,16 +50,12 @@ while(my $line=<IN>){
     if($format eq "gff"){
         my @string=split /[;|=]/,$record;
         if($type eq "gene"){
-            $pre_gid=$string[1];
-	    $pre_tid=$string[1];
-            print OUT "$chr\t$source\t$type\t$start\t$end\t$score\t$sym\t$phase\tgene_id \"$pre_gid\"; transcript_id \"$pre_tid\";\n";
-        }elsif($type eq "mRNA"){
-            if($string[3] eq $pre_gid){
-                $pre_gid=$string[1];
+            if($string[5] eq "protein_coding"){
+                $pre_gid=$string[3];
             }
         }else{
-            if($string[3] eq $pre_gid){
-                $pre_tid=$string[3];
+            if($string[5] eq $pre_gid){
+                $pre_tid=$string[7];
                 print OUT "$chr\t$source\t$type\t$start\t$end\t$score\t$sym\t$phase\tgene_id \"$pre_gid\"; transcript_id \"$pre_tid\";\n";
             }
         }

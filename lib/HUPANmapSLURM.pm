@@ -207,7 +207,7 @@ foreach my $s (@sample){
 #	print JOB "\#SBATCH -p fat\n";               #stderr
 	print JOB "\#SBATCH -n $thread_num\n";             #thread number
 	print JOB "\#SBATCH --ntasks-per-node=$thread_num\n";
-	print JOB "\#SBATCH --time=24:00:00\n";
+	print JOB "\#SBATCH --time=36:00:00\n";
 	print JOB "$com\n";                              #commands
 	close JOB;
 	system("sbatch $job_file");                       #submit job
