@@ -140,7 +140,8 @@ foreach my $s (@sample){
     $unalign_info_file=$quad.$unalign_info_file;
 
 #obtain the filtered coords file within quast dir
-    $quad.="nucmer_output/";
+    $quad.="minimap_output/";
+    #$quad.="nucmer_output/";
     my $coords_file="";
     opendir(ASS,$quad) || die("Error04: cannot open data directory: $quad\n");
     my @nucmer_files=readdir(ASS);
