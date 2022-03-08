@@ -162,9 +162,9 @@ hupanSLURM extractSeq 01_assembled 03_candidate 02_aligned
 
 * This steps maps the assembled contigs in the candidate folder against the reference and checks the statistics of these contigs using QUAST.
 * The QUAST results of the candidate contigs are saved in a folder called 04_quastresult.
-* /cbio/bin if where the QUAST exectuable is located, which runs a QUAST Singularity container.
+* /cbio/projects/015/HUPANdatabases/images/ is where the QUAST exectuable is located, which runs a QUAST Singularity container.
 ```
-hupanSLURM assemSta -t 16 03_candidate/data 04_quastresult /cbio/bin/ /cbio/projects/015/HUPANdatabases/ref/ref.fa
+hupanSLURM assemSta -t 16 03_candidate/data 04_quastresult /cbio/projects/015/HUPANdatabases/images/ /cbio/projects/015/HUPANdatabases/ref/ref.fa
 ```
 hupanSLURM assemSta code is found in `/cbio/soft/HUPAN/lib/HUPANassemStaSLURM.pm`
 
@@ -265,9 +265,9 @@ hupanSLURM rmRedundant cdhitCluster -t 8 11_nonreference/nonrefernce.before.fa 1
 * The population directories should all be in the same location and can therefore be accessed using *.
 * The final non-reference sequences are saved in allpopulations/
 ```
-cat */12_finalpangenome/non-redundant.fa > ../allpopulations/11_nonreference/all.nonrefernce.before.fa
+cat */12_finalpangenome/non-redundant.fa > ../allpopulations/11_nonreference/all.nonreference.before.fa
 cd ../allpopulations
-hupanSLURM rmRedundant cdhitCluster -t 8 11_nonreference/all.nonrefernce.before.fa 12_finalpangenome /cbio/bin/
+hupanSLURM rmRedundant cdhitCluster -t 8 11_nonreference/all.nonreference.before.fa 12_finalpangenome /cbio/bin/
 ```
 * This will result in the final non-redundant non-reference sequence file in `allpopulations/12_finalpangenome/non-redundant.fa` for all populations combined.
 * All steps from this point are performed in the `allpopulations` directory.
