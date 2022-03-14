@@ -299,8 +299,9 @@ hupanSLURM genePre -t 16 13_genepredinput 14_genepred /cbio/projects/008/jess/HU
 **(15) Merging the novel predictions**
 
 * This step merges the novel predictions from the different parts.
-* It akes in the directory where all the different parts' results are (14_genepred) and places them into single files in 15_genepredmerge.
+* It takes in the directory where all the different parts' results are (14_genepred) and places them into single files in 15_genepredmerge.
 * /cbio/bin is where the MAKER executable is.
+* This step is run interactively and produces output in real time (takes about 10 minutes), so first run `screen` and then use a minimal interactive node: `srun --pty bash`
 ```
 hupanSLURM mergeNovGene 14_genepred/result/ 15_genepredmerge /cbio/bin
 ```
