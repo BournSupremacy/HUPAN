@@ -347,14 +347,14 @@ mkdir 17_pan && cat /cbio/projects/015/HUPANdatabases/ref/ref.genes-ptpg-primary
   * First, it combines the novel sequences with the human reference sequences into one file called `pan.fa`. This is the final pan-genome file.
   * It then uses the `bowtie2-build` function to build a Bowtie index from the pan-genome sequences. 
     * This is done interactively and requires a lot of memory, so a `screen` session and an interactive node are required for the second command: `srun --mem=50g --time=24:00:00 --pty bash`
-* Finally, it then aligns all the fastq files (of each genome) to the pan-genome file using Bowtie 2. The fastq files of all samples are found in `0_fastq`.
+* Finally, it then aligns all the fastq files (of each genome) to the pan-genome file using Bowtie 2. The fastq files of all samples are found in `00_fastq`.
 * The `-f` flag specifies Bowtie2 (not BWA), and the `-s` and `-k` flags specify the naming convention of the fastq files given (e.g. `LZP0B_R1.fastq.gz`)
 * `18_map2pan` is the output directory.
 * `/cbio/projects/015/HUPANdatabases/images/` is where I have stored the Bowtie 2 Singularity container.
 ```
 cat /cbio/projects/015/HUPANdatabases/ref/ref.fa 12_finalpangenome/non-redundant.fa > 17_pan/pan.fa
 cd 17_pan && /cbio/projects/015/HUPANdatabases/images/bowtie2-build pan.fa pan && cd ..
-hupanSLURM alignRead -f bowtie2 -t 8 -s .fastq.gz -k _R 0_fastq 18_map2pan /cbio/projects/015/HUPANdatabases/images/ 17_pan/pan
+hupanSLURM alignRead -f bowtie2 -t 8 -s .fastq.gz -k _R 00_fastq 18_map2pan /cbio/projects/015/HUPANdatabases/images/ 17_pan/pan
 ```
 * The final command will result in a `.sam file` for each fastq file (genome/individual) given.
 * hupanSLURM alignRead code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANmapSLURM.pm`
