@@ -131,104 +131,104 @@ Notes:
     
 **(1) *De novo* assembly of individual genomes**
 
-This step assembles the fastq files of each genome into a whole genome using SGA. The assembled sequences are saved in a directory called 01_assembled.
+This step assembles the fastq files of each genome into a whole genome using SGA. The assembled sequences are saved in a directory called `01_assembled`.
 
 This step has been changed from the original HUPAN process; a Nextflow pipeline is now used, developed by Gerrit Botha and myself. The Nextflow pipeline repository can be found at: https://github.com/h3abionet/dec-2020-hackathon-stream1/tree/main/assembly
 
 **(2) Aligning samples to the reference genome**
 
 * This step aligns the assembled genome to the reference genome using the nucmer tool in MUMmer. 
-* The aligned sequences are saved in a folder called 02_aligned.
-* /cbio/bin is the path to the MUMmer, nucmer and show-cords executable files, which all run through a MUMmer Singularity container.
+* The aligned sequences are saved in a folder called `02_aligned`.
+* `/cbio/bin` is the path to the MUMmer, nucmer and show-cords executable files, which all run through a MUMmer Singularity container.
 ```
 hupanSLURM alignContig -t 16 01_assembled 02_aligned /cbio/bin /cbio/projects/015/HUPANdatabases/ref/ref.fa
 ```
-* This will result in .delta and .coords files for each sample.
-* hupanSLURM alignContig code is found in `/cbio/soft/HUPAN/lib/HUPANrmHighSLURM.pm`
+* This will result in `.delta` and `.coords` files for each sample.
+* hupanSLURM alignContig code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANrmHighSLURM.pm`
 
 **(3) Extracting contigs with a low similarity to the reference genome**
 
 * This step identifies and discards all those contigs with > 95% identity and contig length alignment to the reference genome.
-* The sequences with low similarity (and that are potentially non-reference sequences) are saved in a folder called 03_candidate.
-* The final argument (02_aligned) is the path to the MUMmer/nucmer results, created in the previous step.
+* The sequences with low similarity (and that are potentially non-reference sequences) are saved in a folder called `03_candidate`.
+* The final argument (`02_aligned`) is the path to the MUMmer/nucmer results, created in the previous step.
 * This step is run interactively and produces output in real time, so first run `screen` and then use an interactive node: `srun --nodes=1 --ntasks=1 --mem=50g -t 24:00:00 --pty bash`
 ```
 hupanSLURM extractSeq 01_assembled 03_candidate 02_aligned
 ```
-* This will result in a .candidate.unaligned.contig file for each sample.
-* hupanSLURM extractSeq code is found in `/cbio/soft/HUPAN/lib/HUPANrmHighSLURM.pm`
+* This will result in a `.candidate.unaligned.contig` file for each sample.
+* hupanSLURM extractSeq code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANrmHighSLURM.pm`
 
 **(4) Assessing the candidate sequences using QUAST**
 
 * This steps maps the assembled contigs in the candidate folder against the reference and checks the statistics of these contigs using QUAST.
-* The QUAST results of the candidate contigs are saved in a folder called 04_quastresult.
-* /cbio/projects/015/HUPANdatabases/images/ is where the QUAST exectuable is located, which runs a QUAST Singularity container.
+* The QUAST results of the candidate contigs are saved in a folder called `04_quastresult`.
+* `/cbio/projects/015/HUPANdatabases/images/` is where the QUAST exectuable is located, which runs a QUAST Singularity container.
 ```
 hupanSLURM assemSta -t 16 03_candidate/data 04_quastresult /cbio/projects/015/HUPANdatabases/images/ /cbio/projects/015/HUPANdatabases/ref/ref.fa
 ```
-hupanSLURM assemSta code is found in `/cbio/soft/HUPAN/lib/HUPANassemStaSLURM.pm`
+hupanSLURM assemSta code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANassemStaSLURM.pm`
 
 **(5) Collecting unaligned (both fully and partially) contigs**
 
-* This steps collects all unaligned (both fully and partially) contigs from the 03_candidate folder using information from the 04_quastresult folder.
-* The final unaligned sequences will be saved in folder called 05_unaligned.
-* The HUPAN notes on GitHub say to use -p to specify .contig suffix, but the actual .pm file says to use -s.
+* This steps collects all unaligned (both fully and partially) contigs from the 03_candidate folder using information from the `04_quastresult` folder.
+* The final unaligned sequences will be saved in folder called `05_unaligned`.
+* The HUPAN notes on GitHub say to use `-p` to specify .contig suffix, but the actual .pm file says to use `-s`.
 ```
 hupanSLURM getUnalnCtg -s .contig 03_candidate/data 04_quastresult/data 05_unaligned
 ```
-This will result in .fully.contig, partially.contig and partially.coords files for each sample.
-hupanSLURM getUnalnCtg code is found in `/cbio/soft/HUPAN/lib/HUPANunalnCtgsSLURM.pm`
+This will result in `.fully.contig`, `partially.contig` and `partially.coords` files for each sample.
+hupanSLURM getUnalnCtg code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANunalnCtgsSLURM.pm`
 
 **(6) Merging all the unaligned contigs**
 
-* This step merges all the unaligned contigs in 05_unaligned.
-* The resulting files will be saved in the folder 06_mergeunaligned.
+* This step merges all the unaligned contigs in `05_unaligned`.
+* The resulting files will be saved in the folder `06_mergeunaligned`.
 * Partially and fully unaligned contigs are still kept separate, and will each result in one file each.
 ```
 hupanSLURM mergeUnalnCtg 05_unaligned/data 06_mergeunaligned
 ```
 This will result in total.fully.fa, total.partilly.coords and total.partilly.fa files with all the merged data.
-hupanSLURM mergeUnalnCtg code is found in `/cbio/soft/HUPAN/lib/HUPANunalnCtgsSLURM.pm`
+hupanSLURM mergeUnalnCtg code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANunalnCtgsSLURM.pm`
 
 **(7) Removing redundancy**
 
 * This step removes redundancy (i.e. similar sequences) using CD-HIT. 
 * It does this by forming 'clusters' of similar contigs at a defined identity threshold and choosing the longest contig in that cluster as the representative contig. 
 * The command must be performed twice; once for fully unaligned sequences, and once for partially unaligned sequences. 
-* They must be run in a separate directory, called 07_rmredundant. The restults will then be stored in directories within this directory.
-* The default % identity for clustering using CD-HIT in HUPAN is 90%, but you can change it by using the -c flag, e.g. `-c 0.85`
-* /cbio/bin is the location of the cd-hit-est exectuable, which runs a Singularity container.
+* They must be run in a separate directory, called `07_rmredundant`. The restults will then be stored in directories within this directory.
+* The default % identity for clustering using CD-HIT in HUPAN is 90%, but you can change it by using the `-c` flag, e.g. `-c 0.85`
+* `/cbio/bin` is the location of the cd-hit-est exectuable, which runs a Singularity container.
 ```
 mkdir 07_rmredundant && cd 07_rmredundant
 hupanSLURM rmRedundant cdhitCluster -t 8 ../06_mergeunaligned/total.fully.fa rmredundant.fully /cbio/bin
 hupanSLURM rmRedundant cdhitCluster -t 8 ../06_mergeunaligned/total.partilly.fa rmredundant.partially /cbio/bin/
 ```
-* This will result in cluster_info.txt and non-redundant.fa files each for both fully and partially unaligned sequences.
-* hupanSLURM rmRedundant code is found in `/cbio/soft/HUPAN/lib/HUPANrmRdtSLURM.pm`
+* This will result in `cluster_info.txt` and `non-redundant.fa` files each for both fully and partially unaligned sequences.
+* hupanSLURM rmRedundant code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANrmRdtSLURM.pm`
 
 **(8) Identifying contamination in the unaligned sequences**
 
 * This step identifies contamination by comparing all unaligned sequences to the BLAST nucleotide database. 
 * The database has been previously downloaded and set up according to HUPAN GitHub instructions (found above).
-* The aligned results will be saved in a directory called 08_blastresult. Within this directory, there will be a rmredundant.fully and a rmredundant.partially directory.
-* /cbio/bin is where the BLAST executable file is found.
+* The aligned results will be saved in a directory called `08_blastresult`. Within this directory, there will be a `rmredundant.fully` and a `rmredundant.partially` directory.
+* `/cbio/bin` is where the BLAST executable file is found.
 ```
 hupanSLURM blastAlign blast -t 16 07_rmredundant 08_blastresult /cbio/projects/015/HUPANdatabases/blastindex/data/blastdb /cbio/bin
 ```
-* This will result in non-redundan.blast files.
-* hupanSLURM blastAlign code is found in `/cbio/soft/HUPAN/lib/HUPANblastAlignSLURM.pm`
+* This will result in `non-redundan.blast` files.
+* hupanSLURM blastAlign code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANblastAlignSLURM.pm`
 
 **(9) Obtaining the taxonomic classifications of the sequences**
 
 * This steps looks at all the BLAST hits and classifies them into their correct taxonomies (if there are any).
 * It uses two databases downloaded from NCBI: a taxonomy database, and a database that converts accession numbers to taxonomic IDs. Both have already been downloaded and set up (instructuions found above).
 * The command has to be run twice, once each for partially and fully unaligned sequences.
-* Each command will create its own directory; 09.1_taxclassfully for fully unaligned reads and 09.2_taxclasspartially for partially unaligned reads.
+* Each command will create its own directory; `09.1_taxclassfully` for fully unaligned reads and `09.2_taxclasspartially` for partially unaligned reads.
 ```
 hupanSLURM getTaxClass 08_blastresult/data/rmredundant.fully/non-redundan.blast /cbio/projects/015/HUPANdatabases/taxonomyinfo 09.1_taxclassfully
 hupanSLURM getTaxClass 08_blastresult/data/rmredundant.partially/non-redundan.blast /cbio/projects/015/HUPANdatabases/taxonomyinfo 09.2_taxclasspartially
 ```
-* hupanSLURM getTaxClass code is found in `/cbio/soft/HUPAN/lib/HUPANgetTaxClassSLURM.pm`
+* hupanSLURM getTaxClass code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgetTaxClassSLURM.pm`
 
 **(10) Removing contaminating sequences**
 
@@ -241,20 +241,20 @@ hupanSLURM getTaxClass 08_blastresult/data/rmredundant.partially/non-redundan.bl
 hupanSLURM rmCtm -i 60 07_rmredundant/rmredundant.fully/non-redundant.fa 08_blastresult/data/rmredundant.fully/non-redundan.blast 09.1_taxclassfully/accession.name 10.1_rmctmfully
 hupanSLURM rmCtm -i 60 07_rmredundant/rmredundant.partially/non-redundant.fa 08_blastresult/data/rmredundant.partially/non-redundan.blast 09.2_taxclasspartially/accession.name 10.2_rmctmpartially
 ```
-* hupanSLURM rmCtm code is found in `/cbio/soft/HUPAN/lib/HUPANrmContaminateSLURM.pm`
+* hupanSLURM rmCtm code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANrmContaminateSLURM.pm`
 
 **(11) Combining fully and partially unaligned reads**
 
 * This steps removes redundancy again by merging the final fully and partially unaligned sequences, again using CD-HIT.
 * A directory must first be made and then the fully and partially unaligned sequences combined and moved into this directory. This is done in the first command below.
-* This combined file is then run through CD-HIT to remove redundancy (at 90% identity) and the final non-redundant non-reference contigs are saved in 12_finalpangenome.
-* /cbio/bin is the location of the CD-HIT executable.
+* This combined file is then run through CD-HIT to remove redundancy (at 90% identity) and the final non-redundant non-reference contigs are saved in `12_finalpangenome`.
+* `/cbio/bin` is the location of the CD-HIT executable.
 ```
 mkdir 11_nonreference && cat 10.1_rmctmfully/novel_sequence.fa 10.2_rmctmpartially/novel_sequence.fa > 11_nonreference/nonrefernce.before.fa
 hupanSLURM rmRedundant cdhitCluster -t 8 11_nonreference/nonrefernce.before.fa 12_finalpangenome /cbio/bin/
 ```
-* This will result in a tmp directory and cluster_info.txt and non-redundant.fa files.
-* hupanSLURM rmRedundant code is found in `/cbio/soft/HUPAN/lib/HUPANrmRdtSLURM.pm`
+* This will result in a `tmp` directory and `cluster_info.txt` and `non-redundant.fa` files.
+* hupanSLURM rmRedundant code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANrmRdtSLURM.pm`
 
 **(12) Merging the different populations**
 
@@ -263,73 +263,73 @@ hupanSLURM rmRedundant cdhitCluster -t 8 11_nonreference/nonrefernce.before.fa 1
 **By doing this, we are ending up with the same sequences we would have had if we had run all the populations together, but now we have the population-specific information separated and can easily perform downstream or upstream analysis on population differences.**
 * To do this, use `cat` to combine all the sequences into one file, and then use CD-HIT to remove redundancy at 90%.
 * The population directories should all be in the same location and can therefore be accessed using *.
-* The final non-reference sequences are saved in allpopulations/
+* The final non-reference sequences are saved in `allpopulations/`
 ```
 cat */12_finalpangenome/non-redundant.fa > ../allpopulations/11_nonreference/all.nonreference.before.fa
 cd ../allpopulations
 hupanSLURM rmRedundant cdhitCluster -t 8 11_nonreference/all.nonreference.before.fa 12_finalpangenome /cbio/bin/
 ```
 * This will result in the final non-redundant non-reference sequence file in `allpopulations/12_finalpangenome/non-redundant.fa` for all populations combined.
-* All steps from this point are performed in the `allpopulations` directory.
+* All steps from this point are performed in the `allpopulations/` directory.
 
 **(13) Splitting the sequences into smaller files**
 
 * This step splits the non-redundant non-reference sequences into smaller files so that MAKER can handle them easier and quicker.
 * It takes the fasta file and saves it as smaller files in the second directory given.
-* It splits the fasta file into files that contain ~6000 contigs.
-* The output directory is 13_genepredinput.
+* It splits the fasta file into files that contain roughly 2 Mbp, set using the `-m 2000000` flag
+* The output directory is `13_genepredinput`.
 ```
-hupanSLURM splitSeq 12_finalpangenome/non-redundant.fa 13_genepredinput
+hupanSLURM splitSeq -m 2000000 12_finalpangenome/non-redundant.fa 13_genepredinput
 ```
-* This will result in a number of part*.fa files, each consisting of around 6000 sequences
-* The number of files will depend on how many sequences were in the non-redundant.fa file.
-* hupanSLURM splitSeq code is found in `/cbio/soft/HUPAN/lib/HUPANsplitSeqSLURM.pm`
+* This will result in a number of `part*.fa` files.
+* The number of files will depend on how many sequences were in the `non-redundant.fa` file.
+* hupanSLURM splitSeq code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANsplitSeqSLURM.pm`
 
 **(14) Predicting genes from the non-reference sequences**
 
 * This step takes the split up non-reference sequence files and inputs them into MAKER.
 * The config is the MAKER configuration file where we have specified all of the variables and datasets to use. A copy of this config file can be found in this repository.
-* /cbio/bin is the location of the MAKER executable, which runs a MAKER Singularity container.
+* `/cbio/bin` is the location of the MAKER executable, which runs a MAKER Singularity container.
 ```
 hupanSLURM genePre -t 16 13_genepredinput 14_genepred /cbio/projects/008/jess/HUPANrun/AfricanPanGenome/config /cbio/bin
 ```
-* This will result in various MAKER predictions for each part*.fa file.
-* hupanSLURM genePre code is found in `/cbio/soft/HUPAN/lib/HUPANgenePreSLURM.pm`
+* This will result in various MAKER predictions for each `part*.fa` file.
+* hupanSLURM genePre code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgenePreSLURM.pm`
 
 **(15) Merging the novel predictions**
 
 * This step merges the novel predictions from the different parts.
-* It takes in the directory where all the different parts' results are (14_genepred) and places them into single files in 15_genepredmerge.
-* /cbio/bin is where the MAKER executable is.
+* It takes in the directory where all the different parts' results are (`14_genepred`) and places them into single files in `15_genepredmerge`.
+* `/cbio/bin` is where the MAKER executable is.
 * This step is run interactively and produces output in real time (takes about 10 minutes), so first run `screen` and then use a minimal interactive node: `srun --pty bash`
 ```
 hupanSLURM mergeNovGene 14_genepred/result/ 15_genepredmerge /cbio/bin
 ```
-* This will result in all.maker.map, combine.all.maker.gff, combine.all.maker.proteins.fasta and combine.all.maker.transcripts.fasta files.
-* hupanSLURM mergeNovGene code is found in `/cbio/soft/HUPAN/lib/HUPANmergeNovGene.pm`
+* This will result in `all.maker.map`, `combine.all.maker.gff`, `combine.all.maker.proteins.fasta` and `combine.all.maker.transcripts.fasta` files.
+* hupanSLURM mergeNovGene code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANmergeNovGene.pm`
 
 **(16) Filtering the gene predicitons**
 
 * This step filters and refines the novel predicted genes based on HUPAN specifications. These specifications can be found in the HUPAN paper supplementary methods.
-* The first command copies the non-redundant.fa sequence file from 12_finalpangenome to the 15_genepredmerge directory, because the script needs it to work. Call it novel.fa.
-* The ref/ directory contains exactly what the HUPAN script looks for with the exact names, i.e. ref.fa and ref.transcripts.fa (explained above).
+* The first command copies the `non-redundant.fa` sequence file from `12_finalpangenome` to the `15_genepredmerge` directory, because the script needs it to work. Call it `novel.fa`.
+* The `ref/` directory contains exactly what the HUPAN script looks for with the exact names, i.e. `ref.fa` and `ref.transcripts.fa` (explained above).
 * The last three inputs are (in order) the locations of the BLAST, CD-HIT and RepeatMasker executables respectively.
 ```
 cp 12_finalpangenome/non-redundant.fa 15_genepredmerge/novel.fa
 hupanSLURM filterNovGene -t 16 15_genepredmerge 16_genepredfilter /cbio/projects/015/HUPANdatabases/ref /cbio/bin/ /cbio/bin/ /cbio/bin/
 ```
-* hupanSLURM filterNovGene code is found in `/cbio/soft/HUPAN/lib/HUPANfilterNovGeneSLURM.pm`
+* hupanSLURM filterNovGene code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANfilterNovGeneSLURM.pm`
 
 **(17) Assembling the pan-genome**
 
 * This step has does two things. First:
-  * It takes in the human reference annotation file in ref/ref.genes.fa and retains only the longest transcript of each annotation while discarding others, like mRNA, lncRNA, etc.
-  * The -f flag just tells the script that the file is in gtf format, not gff.
-  * It saves the annotations in a file called ref.genes-ptpg.gtf, found in the /cbio/projects/015/HUPANdatabases/ref directory. 
+  * It takes in the human reference annotation file in `ref/ref.genes.fa` and retains only the longest transcript of each annotation while discarding others, like mRNA, lncRNA, etc.
+  * The `-f` flag just tells the script that the file is in gtf format, not gff.
+  * It saves the annotations in a file called `ref.genes-ptpg.gtf`, found in the `/cbio/projects/015/HUPANdatabases/ref` directory. 
   * The annotation file was downloaded from https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.chr_patch_hapl_scaff.annotation.gtf.gz (release 38).
-  * The annotation file downloaded must be later than release 21, otherwise the HUPAN script won't work as it will be in a different format (format changed after release 21).
-  * However, you also have to remove any annotations from patch/alt/decoy/unplaced contigs! So remove from the file all lines after "chrM" (mitochondrial DNA) annotations. I have not shown this step below, as the exact line numbers may be different.
-  * So essentially, run the pTpG script on the annotation file, and then remove the extra annotations and save the final working file as ref.genes-ptpg-primaryseqs.gtf.
+    * The annotation file downloaded MUST be later than release 21, otherwise the HUPAN script won't work as it will be in a different format (format changed after release 21).
+    * However, you also have to remove any annotations from patch/alt/decoy/unplaced/mitochondrial DNA contigs, as the HUPAN pipeline seems to be unable to recognise them. So remove from the annotation file all lines after "chrY" annotations. I have not shown this step below, as the exact line numbers may be different.
+  * In summary: run the `pTpG` script on the annotation file, and then remove the extra annotations and save the final working file as `ref.genes-ptpg-primaryseqs.gtf`.
 * Then secondly, we combine this annotation file and the novel sequence annotation (from step 16) into one annotation file
   * You must first convert the novel annotation file into GTF format too, or otherwise start with GFF format for the reference annotation.
 * Both steps done in real time (interactively) so use `screen` and then start an interactive node with extra memory: `srun --mem=15g --pty bash`
@@ -339,53 +339,53 @@ hupanSLURM pTpG -f /cbio/projects/015/HUPANdatabases/ref/ref.genes.gtf /cbio/pro
 # insert step to convert the Final.gff file to GTF format.
 mkdir 17_pan && cat /cbio/projects/015/HUPANdatabases/ref/ref.genes-ptpg-primaryseqs.gtf 16_genepredfilter/data/Final/Final.gtf > 17_pan/pan.gtf
 ```
-* hupanSLURM pTpG code is found in `/cbio/soft/HUPAN/lib/HUPANpTpGSLURM.pm`
+* hupanSLURM pTpG code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANpTpGSLURM.pm`
 
 **(18) Aligning the samples to the pan-genome**
 
 * This step does three things:
-  * First, it combines the novel sequences with the human reference sequences into one file called pan.fa. This is the final pan-genome file.
-  * It then uses the bowtie2-build function to build a Bowtie index from the pan-genome sequences. 
-    * This is done interactively and requires a lot of memory, so a `screen` session and an interactive node is required for the second command: `srun --mem=50g --time=24:00:00 --pty bash`
-* Finally, it then aligns all the fastq files (of each genome) to the pan-genome file using Bowtie 2. The fastq files of all samples are found in 0_fastq.
-* The -f flag specifies Bowtie2 (not BWA), and the -s and -k flags specify the naming convention of the fastq files given (e.g. LZP0B_R1.fastq.gz)
-* 18_map2pan is the output directory.
-* /cbio/projects/015/HUPANdatabases/images/ is where I have stored the Bowtie 2 Singularity container.
+  * First, it combines the novel sequences with the human reference sequences into one file called `pan.fa`. This is the final pan-genome file.
+  * It then uses the `bowtie2-build` function to build a Bowtie index from the pan-genome sequences. 
+    * This is done interactively and requires a lot of memory, so a `screen` session and an interactive node are required for the second command: `srun --mem=50g --time=24:00:00 --pty bash`
+* Finally, it then aligns all the fastq files (of each genome) to the pan-genome file using Bowtie 2. The fastq files of all samples are found in `0_fastq`.
+* The `-f` flag specifies Bowtie2 (not BWA), and the `-s` and `-k` flags specify the naming convention of the fastq files given (e.g. `LZP0B_R1.fastq.gz`)
+* `18_map2pan` is the output directory.
+* `/cbio/projects/015/HUPANdatabases/images/` is where I have stored the Bowtie 2 Singularity container.
 ```
 cat /cbio/projects/015/HUPANdatabases/ref/ref.fa 12_finalpangenome/non-redundant.fa > 17_pan/pan.fa
 cd 17_pan && /cbio/projects/015/HUPANdatabases/images/bowtie2-build pan.fa pan && cd ..
 hupanSLURM alignRead -f bowtie2 -t 8 -s .fastq.gz -k _R 0_fastq 18_map2pan /cbio/projects/015/HUPANdatabases/images/ 17_pan/pan
 ```
-* The final command will result in a .sam file for each fastq file (genome/individual) given.
-* hupanSLURM alignRead code is found in `/cbio/soft/HUPAN/lib/HUPANmapSLURM.pm`
+* The final command will result in a `.sam file` for each fastq file (genome/individual) given.
+* hupanSLURM alignRead code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANmapSLURM.pm`
 
 **(19) Converting to SAM format**
 
-* This step uses Samtools to convert the .sam to .bam and then sort and index the .bam files.
-* It takes in the .sam files in the 18_map2pan directory and outputs the sorted and indexed .bam files to the 19_panBam directory.
-* /cbio/bin is where the Samtools executable is found.
+* This step uses Samtools to convert the `.sam` files to `.bam` format and then sort and index the `.bam` files.
+* It takes in the `.sam` files in the `18_map2pan` directory and outputs the sorted and indexed `.bam` files to the `19_panBam` directory.
+* `/cbio/bin` is where the Samtools executable is found.
 ```
 hupanSLURM sam2bam -t 8 18_map2pan/data 19_panBam /cbio/bin
 ```
-* This will result in a .bam and .bai file for each fastq file (genome/individual) given.
-* hupanSLURM sam2bam code is found in `/cbio/soft/HUPAN/lib/HUPANsamToBamSLURM.pm`
+* This will result in a `.bam` and `.bai` file for each fastq file (genome/individual) given.
+* hupanSLURM sam2bam code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANsamToBamSLURM.pm`
 
 **(20) Calculating gene coverage**
 
 * This step calculates the coverage of each gene or CDS in all of the genomes used.
-* It does this by looking at the alignment information in the indexed and sorted .bam files from the previous step and identifying whether these alignments fall within the annotations in the pan.gtf file.
-* The results will be output to the 20_geneCov directory.
+* It does this by looking at the alignment information in the indexed and sorted `.bam` files from the previous step and identifying whether these alignments fall within the annotations in the `pan.gtf` file.
+* The results will be output to the `20_geneCov` directory.
 ```
 hupanSLURM geneCov -t 8 19_panBam/data 20_geneCov/ 17_pan/pan.gtf
 ```
-* This will result in a .sta file for each genome.
-* hupanSLURM geneCov code is found in `/cbio/soft/HUPAN/lib/HUPANgeneCovSLURM.pm`
+* This will result in a `.sta` file for each genome.
+* hupanSLURM geneCov code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgeneCovSLURM.pm`
 
 **(21) Determing gene presence-absence variance profile**
 
 * This steps checks whether a gene is present or absent (based on a defined coverage threshold) for each sample.
-* The gene coverage information from the 20_geneCov directory is first combined into two files, one recording gene coverage and one recording CDS coverage.
-  * The first input is the prefix you want to use for the merged file, and the second input is that data directory where the .sta files are.
+* The gene coverage information from the `20_geneCov` directory is first combined into two files, one recording gene coverage and one recording CDS coverage.
+  * The first input is the prefix you want to use for the merged file, and the second input is that data directory where the `.sta` files are.
 * The final HUPAN command takes in the two files outputted from the previous command and creates the gene presence-absence variance profile.
 * It does this by checking the gene or CDS coverage at a certain threshold. HUPAN sets theirs at 95% gene coverage.
 * For this command, the two integer values are (in order) the minimum gene coverage and the minimum CDS coverage.
@@ -393,7 +393,9 @@ hupanSLURM geneCov -t 8 19_panBam/data 20_geneCov/ 17_pan/pan.gtf
 cd 20_geneCov && hupanSLURM mergeGeneCov geneCovmerged 20_geneCov/data
 mkdir 21_geneExist && hupanSLURM geneExist 20_geneCov/summary_gene.cov 20_geneCov/summary_cds.cov 0 0.95 > 21_geneExist/gene.exist
 ```
-* The first command will result in geneCovmergedgene.cov and geneCovmergedcds.cov files.
-* hupanSLURM mergeGeneCov code is found in `/cbio/soft/HUPAN/lib/HUPANgeneCovSLURM.pm`
-* The second command will result in the gene.exist file.
-* hupanSLURM geneExist code is found in `/cbio/soft/HUPAN/lib/HUPANgeneExistSLURM.pm`
+* The first command will result in `geneCovmergedgene.cov` and `geneCovmergedcds.cov` files.
+* hupanSLURM mergeGeneCov code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgeneCovSLURM.pm`
+* The second command will result in the `gene.exist file`.
+* hupanSLURM geneExist code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgeneExistSLURM.pm`
+
+And now you're finally done!
