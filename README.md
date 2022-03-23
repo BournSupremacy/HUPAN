@@ -390,8 +390,8 @@ hupanSLURM geneCov -t 8 19_panBam/data 20_geneCov/ 17_pan/pan.gtf
 * It does this by checking the gene or CDS coverage at a certain threshold. HUPAN sets theirs at 95% gene coverage.
 * For this command, the two integer values are (in order) the minimum gene coverage and the minimum CDS coverage.
 ```
-cd 20_geneCov && hupanSLURM mergeGeneCov geneCovmerged data
-mkdir 21_geneExist && hupanSLURM geneExist 20_geneCov/summary_gene.cov 20_geneCov/summary_cds.cov 0 0.95 > 21_geneExist/gene.exist
+cd 20_geneCov && hupanSLURM mergeGeneCov summary_ data && cd ..
+mkdir 21_geneExist && hupanSLURM geneExist 20_geneCov/summary_gene.cov 20_geneCov/summary_cds.cov 0 0.95 > 21_geneExist/cds95.gene.exist
 ```
 * The first command will result in `geneCovmergedgene.cov` and `geneCovmergedcds.cov` files.
 * hupanSLURM mergeGeneCov code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgeneCovSLURM.pm`
