@@ -399,3 +399,29 @@ mkdir 21_geneExist && hupanSLURM geneExist 20_geneCov/summary_gene.cov 20_geneCo
 * hupanSLURM geneExist code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgeneExistSLURM.pm`
 
 And now you're finally done!
+
+**Performing simulations using the HUPAN suite**
+
+* The HUPAN pipelines offers two simulation outputs on your data:
+  * The `sim` function simulates the size of the core and pan-genomes from the gene presence-absence data generated in step 21.
+  * The `simSeq` function simulates and plots the total amount of novel sequence as more individuals are added.
+
+* For the `sim` function:
+  * A `screen` session and a minimum interactive node are required: `srun --pty bash`
+  * You must choose whichever `.gene.exist` file is most apprpropriate for analysis of the pan-genome. Here, gene coverage of 95% is chosen.
+```
+mkdir 22_simulations
+hupanSLURM sim 21_geneExist/gene95.gene.exist 22_simulations/PAV
+```
+* This will result in a `sim_out.txt` file and a `sim_out.txt_PAV_plot.pdf` file with the simulated data and plots in them.
+
+* For the `simSeq` function:
+  * The first command performs the simulation on the sample-specific unaligned data in `05_unaligned`. 
+  * `/cbio/bin` is the location of the CD-HIT executable which is used for the simulation.
+  * This simulation will take a few days to run depending on the number of samples.
+  * The second command just plots the result and is interactive, so a `screen` session and a minimum interactive node are required: `srun --pty bash`
+```
+hupanSLURM simSeq simNovelSeq -t 8 05_unaligned/data/ 22_simulations/novelSeqs /cbio/bin
+hupanSLURM simSeq plotNovelSeq 22_simulations/novelSeqs/ outputPlot
+```
+* This will result in a `simNovelSeq.pdf` file with the simulated plot.
