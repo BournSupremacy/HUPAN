@@ -112,7 +112,7 @@ Notes:
 * The trimming and quality control checking of the fastq files for each sample was performed separately to the pipeline.
 * For most steps, the number of threads used can be specified with the `-t` flag. I usually utilised 8 or 16, depending on the state of the cluster.
 * Before starting the pipeline, I created a `HUPANdatabases` directory that contains all the necessary databases and reference sequences and annotations needed for the pipeline. In this directory there is:
-  * The human reference genome fasta file saved in `ref/ref.fa` (downloaded from https://gatk.broadinstitute.org/hc/en-us/articles/360035890951-Human-genome-reference-builds-GRCh38-or-hg38-b37-hg19)
+  * The human reference genome fasta file saved in `ref/ref.genome.fa` (downloaded from https://gatk.broadinstitute.org/hc/en-us/articles/360035890951-Human-genome-reference-builds-GRCh38-or-hg38-b37-hg19)
   * The human reference genome transcript file saved in `ref/ref.transcripts.fa` (downloaded from https://www.gencodegenes.org/human/releases.html, release 35)
   * The human reference genome annotation GTF file saved in `ref/ref.genes.gtf` (downloaded from https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.chr_patch_hapl_scaff.annotation.gtf.gz, release 38)
   * NCBI's BLAST non-redundant nucleotide database saved as `/blastindex/data/blastdb.nal`, downloaded and set up as follows:
@@ -141,7 +141,7 @@ This step has been changed from the original HUPAN process; a Nextflow pipeline 
 * The aligned sequences are saved in a folder called `02_aligned`.
 * `/cbio/bin` is the path to the MUMmer, nucmer and show-cords executable files, which all run through a MUMmer Singularity container.
 ```
-hupanSLURM alignContig -t 16 01_assembled 02_aligned /cbio/bin /cbio/projects/015/HUPANdatabases/ref/ref.fa
+hupanSLURM alignContig -t 16 01_assembled 02_aligned /cbio/bin /cbio/projects/015/HUPANdatabases/ref/ref.genome.fa
 ```
 * This will result in `.delta` and `.coords` files for each sample.
 * hupanSLURM alignContig code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANrmHighSLURM.pm`
@@ -164,7 +164,7 @@ hupanSLURM extractSeq 01_assembled 03_candidate 02_aligned
 * The QUAST results of the candidate contigs are saved in a folder called `04_quastresult`.
 * `/cbio/projects/015/HUPANdatabases/images/` is where the QUAST exectuable is located, which runs a QUAST Singularity container.
 ```
-hupanSLURM assemSta -t 16 03_candidate/data 04_quastresult /cbio/projects/015/HUPANdatabases/images/ /cbio/projects/015/HUPANdatabases/ref/ref.fa
+hupanSLURM assemSta -t 16 03_candidate/data 04_quastresult /cbio/projects/015/HUPANdatabases/images/ /cbio/projects/015/HUPANdatabases/ref/ref.genome.fa
 ```
 hupanSLURM assemSta code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANassemStaSLURM.pm`
 
@@ -312,7 +312,7 @@ hupanSLURM mergeNovGene 14_genepred/result/ 15_genepredmerge /cbio/bin
 
 * This step filters and refines the novel predicted genes based on HUPAN specifications. These specifications can be found in the HUPAN paper supplementary methods.
 * The first command copies the `non-redundant.fa` sequence file from `12_finalpangenome` to the `15_genepredmerge` directory, because the script needs it to work. Call it `novel.fa`.
-* The `ref/` directory contains exactly what the HUPAN script looks for with the exact names, i.e. `ref.fa` and `ref.transcripts.fa` (explained above).
+* The `ref/` directory contains exactly what the HUPAN script looks for with the exact names, i.e. `ref.genome.fa` and `ref.transcripts.fa` (explained above).
 * The last three inputs are (in order) the locations of the BLAST, CD-HIT and RepeatMasker executables respectively.
 ```
 cp 12_finalpangenome/non-redundant.fa 15_genepredmerge/novel.fa
@@ -352,7 +352,7 @@ mkdir 17_pan && cat /cbio/projects/015/HUPANdatabases/ref/ref.genes-ptpg-primary
 * `18_map2pan` is the output directory.
 * `/cbio/projects/015/HUPANdatabases/images/` is where I have stored the Bowtie 2 Singularity container.
 ```
-cat /cbio/projects/015/HUPANdatabases/ref/ref.fa 12_finalpangenome/non-redundant.fa > 17_pan/pan.fa
+cat /cbio/projects/015/HUPANdatabases/ref/ref.genome.fa 12_finalpangenome/non-redundant.fa > 17_pan/pan.fa
 cd 17_pan && /cbio/projects/015/HUPANdatabases/images/bowtie2-build pan.fa pan && cd ..
 hupanSLURM alignRead -f bowtie2 -t 8 -s .fastq.gz -k _R 00_fastq 18_map2pan /cbio/projects/015/HUPANdatabases/images/ 17_pan/pan
 ```
