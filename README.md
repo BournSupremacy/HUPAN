@@ -168,6 +168,14 @@ hupanSLURM assemSta -t 16 03_candidate/data 04_quastresult /cbio/projects/015/HU
 ```
 hupanSLURM assemSta code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANassemStaSLURM.pm`
 
+Once this fourth step is finished running, the output needs to be changed slightly (due to the change in aligner in the later QUAST version).
+This can be performed using the `fixQuastOutput.py` script located in `/cbio/projects/015/HUPANdatabases/`.
+Run this script using the command below and follow the prompts to input the working directory and the population directories.
+This step is run interactively and produces output in real time, so first run `screen` and then use an interactive node: `srun --nodes=1 --ntasks=1 -t 6:00:00 --pty bash`
+```
+python /cbio/projects/015/HUPANdatabases/fixQuastOutput.py
+```
+
 **(5) Collecting unaligned (both fully and partially) contigs**
 
 * This steps collects all unaligned (both fully and partially) contigs from the 03_candidate folder using information from the `04_quastresult` folder.
