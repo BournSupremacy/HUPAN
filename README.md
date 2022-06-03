@@ -330,7 +330,7 @@ hupanSLURM filterNovGene -t 16 15_genepredmerge 16_genepredfilter /cbio/projects
 
 **(17) Assembling the pan-genome**
 
-* This step has does multiple things. First:
+* This step does multiple things. First:
   * It takes in the human reference annotation file in `ref/ref.genes.fa` and retains only the longest transcript of each annotation while discarding others, like mRNA, lncRNA, etc. It also removes any annotations from patch/alt/decoy/unplaced/mitochondrial DNA contigs, as the HUPAN pipeline seems to be unable to recognise them.
   * This step, however, HAS ALREADY BEEN COMPLETED using the original HUPAN `pTpG` script and some additional scripting to remove the extra annotations.The primary annotations have been saved in a file called ` ref.genes-ptpg-primaryseqs.gtf`, found in the `/cbio/projects/015/HUPANdatabases/ref` directory.
   * NO MORE ACTION IS REQUIRED FOR THIS ANNOTATIOIN FILE. You can use it as is. Should a new annotation file need to be made, contact Jess Bourn for guidance. 
@@ -340,7 +340,7 @@ hupanSLURM filterNovGene -t 16 15_genepredmerge 16_genepredfilter /cbio/projects
 * Then secondly, we convert the novel annotation file (GFF format) into GTF format in order to combine it succcessfully with the primary sequence annotation GTF file.
   * This is done using an adapted form of the HUPAN `pTpG` script and the result is saved in the same `16_genepredfilter/data/Final/` directory.
 * Once these two steps have been completed, the two files can be merged to make the pan-genome annotation file. 
-* These steps are done in real time (interactively) so use `screen` and then start an interactive node with extra memory: `srun --mem=10g --pty bash`
+* These steps are done in real time (interactively) so use `screen` and then start an interactive node: `srun --pty bash`
 ```
 hupanSLURM pTpG 16_genepredfilter/data/Final/Final.gff 16_genepredfilter/data/Final/Final-ptpg.gtf
 mkdir 17_pan && cat /cbio/projects/015/HUPANdatabases/ref/ref.genes-ptpg-primaryseqs.gtf 16_genepredfilter/data/Final/Final-ptpg.gtf > 17_pan/pan.gtf
