@@ -330,24 +330,23 @@ hupanSLURM filterNovGene -t 16 15_genepredmerge 16_genepredfilter /cbio/projects
 
 **(17) Assembling the pan-genome**
 
-* This step has does two things. First:
-  * It takes in the human reference annotation file in `ref/ref.genes.fa` and retains only the longest transcript of each annotation while discarding others, like mRNA, lncRNA, etc.
-  * The `-f` flag just tells the script that the file is in gtf format, not gff.
-  * It saves the annotations in a file called `ref.genes-ptpg.gtf`, found in the `/cbio/projects/015/HUPANdatabases/ref` directory. 
-  * The annotation file was downloaded from https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.chr_patch_hapl_scaff.annotation.gtf.gz (release 38).
+* This step has does multiple things. First:
+  * It takes in the human reference annotation file in `ref/ref.genes.fa` and retains only the longest transcript of each annotation while discarding others, like mRNA, lncRNA, etc. It also removes any annotations from patch/alt/decoy/unplaced/mitochondrial DNA contigs, as the HUPAN pipeline seems to be unable to recognise them.
+  * This step, however, HAS ALREADY BEEN COMPLETED using the original HUPAN `pTpG` script and some additional scripting to remove the extra annotations.The primary annotations have been saved in a file called ` ref.genes-ptpg-primaryseqs.gtf`, found in the `/cbio/projects/015/HUPANdatabases/ref` directory.
+  * NO MORE ACTION IS REQUIRED FOR THIS ANNOTATIOIN FILE. You can use it as is. Should a new annotation file need to be made, contact Jess Bourn for guidance. 
+  * Some additional information:
+    * The original annotation file was downloaded from https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.chr_patch_hapl_scaff.annotation.gtf.gz (release 38).
     * The annotation file downloaded MUST be later than release 21, otherwise the HUPAN script won't work as it will be in a different format (format changed after release 21).
-    * However, you also have to remove any annotations from patch/alt/decoy/unplaced/mitochondrial DNA contigs, as the HUPAN pipeline seems to be unable to recognise them. So remove from the annotation file all lines after "chrY" annotations. I have not shown this step below, as the exact line numbers may be different.
-  * In summary: run the `pTpG` script on the annotation file, and then remove the extra annotations and save the final working file as `ref.genes-ptpg-primaryseqs.gtf`.
-* Then secondly, we combine this annotation file and the novel sequence annotation (from step 16) into one annotation file
-  * You must first convert the novel annotation file into GTF format too, or otherwise start with GFF format for the reference annotation.
-* Both steps done in real time (interactively) so use `screen` and then start an interactive node with extra memory: `srun --mem=15g --pty bash`
+* Then secondly, we convert the novel annotation file (GFF format) into GTF format in order to combine it succcessfully with the primary sequence annotation GTF file.
+  * This is done using an adapted form of the HUPAN `pTpG` script and the result is saved in the same `16_genepredfilter/data/Final/` directory.
+* Once these two steps have been completed, the two files can be merged to make the pan-genome annotation file. 
+* These steps are done in real time (interactively) so use `screen` and then start an interactive node with extra memory: `srun --mem=10g --pty bash`
 ```
-hupanSLURM pTpG -f /cbio/projects/015/HUPANdatabases/ref/ref.genes.gtf /cbio/projects/015/HUPANdatabases/ref/ref.genes-ptpg.gtf
-# insert step to remove any additional annotations and save the primary sequence annotations as ref.genes-ptpg-primaryseqs.gtf
-# insert step to convert the Final.gff file to GTF format.
-mkdir 17_pan && cat /cbio/projects/015/HUPANdatabases/ref/ref.genes-ptpg-primaryseqs.gtf 16_genepredfilter/data/Final/Final.gtf > 17_pan/pan.gtf
+hupanSLURM pTpG 16_genepredfilter/data/Final/Final.gff 16_genepredfilter/data/Final/Final-ptpg.gtf
+mkdir 17_pan && cat /cbio/projects/015/HUPANdatabases/ref/ref.genes-ptpg-primaryseqs.gtf 16_genepredfilter/data/Final/Final-ptpg.gtf > 17_pan/pan.gtf
 ```
-* hupanSLURM pTpG code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANpTpGSLURM.pm`
+* The original hupanSLURM pTpG code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANpTpGSLURMoriginal.pm`
+* The MAKER-adapted hupanSLURM pTpG code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANpTpGSLURM.pm`
 
 **(18) Aligning the samples to the pan-genome**
 
