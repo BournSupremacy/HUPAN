@@ -381,11 +381,15 @@ hupanSLURM sam2bam -t 8 18_map2pan/data 19_panBam /cbio/bin
 
 * This step calculates the coverage of each gene or CDS in all of the genomes used.
 * It does this by looking at the alignment information in the indexed and sorted `.bam` files from the previous step and identifying whether these alignments fall within the annotations in the `pan.gtf` file.
-* The results will be output to the `20_geneCov` directory.
+* The results will be output to the `20_geneCovwithY` directory.
+* Of importnace: the HUPAN authors removed the Y chromosome genes/CDS regions from further analysis as these would be classified as "distributed" in female samples (as they do not have Y chromosome genes). 
+ * We also implemented this using the second command below.
+ * First, a copy is made of the original directory so the data is available if needed. Then 'sed' is used to remove all annotation lines containing the string 'chrY'.
 ```
-hupanSLURM geneCov -t 8 19_panBam/data 20_geneCov/ 17_pan/pan.gtf
+hupanSLURM geneCov -t 8 19_panBam/data 20_geneCovwithY/ 17_pan/pan.gtf
+cp -r 20_geneCovwithY 20_geneCov && cd 20_geneCov/data && for i in *; do sed -i '/chrY/d' $i/$i.sta; done && cd ../../
 ```
-* This will result in a `.sta` file for each genome.
+* This will result in two `.sta` files for each sample, one containing Y annotations and one not.
 * hupanSLURM geneCov code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgeneCovSLURM.pm`
 
 **(21) Determing gene presence-absence variance profile**
