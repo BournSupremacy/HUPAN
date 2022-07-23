@@ -269,13 +269,13 @@ hupanSLURM rmRedundant cdhitCluster -t 8 11_nonreference/nonrefernce.before.fa 1
 **At this point, each population has its own non-redundant non-reference sequences. Now we can combine them and remove redundancy.**
 
 **By doing this, we are ending up with the same sequences we would have had if we had run all the populations together, but now we have the population-specific information separated and can easily perform downstream or upstream analysis on population differences.**
-* To do this, use `cat` to combine all the sequences into one file, and then use CD-HIT to remove redundancy at 90%.
+* To do this, use `cat` to combine all the sequences into one file, and then use CD-HIT to remove redundancy at 95%.
 * The population directories should all be in the same location and can therefore be accessed using *.
 * The final non-reference sequences are saved in `allpopulations/`
 ```
 cat */12_finalpangenome/non-redundant.fa > ../allpopulations/11_nonreference/all.nonreference.before.fa
 cd ../allpopulations
-hupanSLURM rmRedundant cdhitCluster -t 8 11_nonreference/all.nonreference.before.fa 12_finalpangenome /cbio/bin/
+hupanSLURM rmRedundant cdhitCluster -t 8 -c 0.95 11_nonreference/all.nonreference.before.fa 12_finalpangenome /cbio/bin/
 ```
 * This will result in the final non-redundant non-reference sequence file in `allpopulations/12_finalpangenome/non-redundant.fa` for all populations combined.
 * All steps from this point are performed in the `allpopulations/` directory.
@@ -299,7 +299,7 @@ hupanSLURM splitSeq -m 2000000 12_finalpangenome/non-redundant.fa 13_genepredinp
 * The config is the MAKER configuration file where we have specified all of the variables and datasets to use. A copy of this config file can be found in this repository.
 * `/cbio/bin` is the location of the MAKER executable, which runs a MAKER Singularity container.
 ```
-hupanSLURM genePre -t 16 13_genepredinput 14_genepred /cbio/projects/008/jess/HUPANrun/AfricanPanGenome/config /cbio/bin
+hupanSLURM genePre -t 16 13_genepredinput 14_genepred /cbio/projects/015/HUPANrun/AfricanPanGenome/RefGraphMAKERconfig /cbio/bin
 ```
 * This will result in various MAKER predictions for each `part*.fa` file.
 * hupanSLURM genePre code is found in `/cbio/projects/015/HUPANdatabases/HUPAN/lib/HUPANgenePreSLURM.pm`
